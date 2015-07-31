@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "PlannerReport", "PlannerReport\PlannerReport.rptproj", "{002F59B2-09A0-499C-877F-0831C28E727E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Debug|Default.ActiveCfg = Debug
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Debug|Default.Build.0 = DebugLocal
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Debug|Default.Deploy.0 = DebugLocal
+		{002F59B2-09A0-499C-877F-0831C28E727E}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{002F59B2-09A0-499C-877F-0831C28E727E}.DebugLocal|Default.Build.0 = DebugLocal
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Release|Default.ActiveCfg = Release
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Release|Default.Build.0 = Release
+		{002F59B2-09A0-499C-877F-0831C28E727E}.Release|Default.Deploy.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
