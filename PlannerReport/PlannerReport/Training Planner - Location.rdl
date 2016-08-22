@@ -6,7 +6,7 @@
     <DataSource Name="TrainerData">
       <DataSourceReference>TrainerData</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
-      <rd:DataSourceID>98305452-0ff5-4993-ba34-28885c99f319</rd:DataSourceID>
+      <rd:DataSourceID>81a336da-2fc9-4ccf-b641-dce1c52bf627</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
@@ -14,18 +14,19 @@
       <Query>
         <DataSourceName>TrainerData</DataSourceName>
         <QueryParameters>
-          <QueryParameter Name="@StartDate">
-            <Value>=Parameters!StartDate.Value</Value>
+          <QueryParameter Name="@startDate">
+            <Value>=Parameters!startDate.Value</Value>
           </QueryParameter>
-          <QueryParameter Name="@EndDate">
-            <Value>=Parameters!EndDate.Value</Value>
+          <QueryParameter Name="@endDate">
+            <Value>=Parameters!endDate.Value</Value>
           </QueryParameter>
-          <QueryParameter Name="@IncludeWeekends">
-            <Value>=Parameters!IncludeWeekends.Value</Value>
+          <QueryParameter Name="@includeWeekends">
+            <Value>=Parameters!includeWeekends.Value</Value>
           </QueryParameter>
         </QueryParameters>
-        <CommandText>SELECT Date, Day, Trainer, Time, Course + CHAR(10) + CHAR(13) + Location AS Details, Bookings, Available, Colour
-FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trainer_1</CommandText>
+        <CommandText>select Date, Day, Location, Time, Course + isnull(CHAR(10) + CHAR(13) + Trainer, '') as Details, Bookings, Available, Colour
+from train.plan_location(@startDate, @endDate, @includeWeekends)</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
       </Query>
       <Fields>
         <Field Name="Date">
@@ -36,8 +37,8 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
           <DataField>Day</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
-        <Field Name="Trainer">
-          <DataField>Trainer</DataField>
+        <Field Name="Location">
+          <DataField>Location</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Time">
@@ -62,6 +63,22 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="DataSet2">
+      <Query>
+        <DataSourceName>TrainerData</DataSourceName>
+        <CommandText>SELECT DATEADD(mm, DATEDIFF(mm,0,getdate()), 0) StartOfMonth,  DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)) EndOfMonth</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="StartOfMonth">
+          <DataField>StartOfMonth</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="EndOfMonth">
+          <DataField>EndOfMonth</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -73,7 +90,7 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Pennine Care IT Training Planner</Value>
+                    <Value>Pennine Care Training Planner - Locations</Value>
                     <Style>
                       <FontFamily>Segoe UI Light</FontFamily>
                       <FontSize>24pt</FontSize>
@@ -86,7 +103,7 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
             </Paragraphs>
             <rd:DefaultName>textbox1</rd:DefaultName>
             <Height>0.42in</Height>
-            <Width>5in</Width>
+            <Width>8.21667in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -163,7 +180,6 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                                 <TextRun>
                                   <Value>=First(Fields!Details.Value)</Value>
                                   <Style>
-                                    <FontSize>8pt</FontSize>
                                     <Color>#333333</Color>
                                   </Style>
                                 </TextRun>
@@ -174,9 +190,28 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                           <rd:DefaultName>textbox2</rd:DefaultName>
                           <Style>
                             <Border>
-                              <Color>LightGrey</Color>
                               <Style>Solid</Style>
                             </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <LeftBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </LeftBorder>
+                            <RightBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </RightBorder>
                             <BackgroundColor>=Fields!Colour.Value</BackgroundColor>
                             <PaddingLeft>2pt</PaddingLeft>
                             <PaddingRight>2pt</PaddingRight>
@@ -204,22 +239,84 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                       <Value>=Fields!Date.Value</Value>
                     </SortExpression>
                   </SortExpressions>
+                  <TablixHeader>
+                    <Size>0.21in</Size>
+                    <CellContents>
+                      <Textbox Name="Date">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>=Fields!Date.Value</Value>
+                                <Style>
+                                  <Format>dd</Format>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Center</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>Date</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Style>Solid</Style>
+                          </Border>
+                          <TopBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </TopBorder>
+                          <BottomBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </BottomBorder>
+                          <LeftBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </LeftBorder>
+                          <RightBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </RightBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
                   <TablixMembers>
                     <TablixMember>
+                      <Group Name="matrix1_Day">
+                        <GroupExpressions>
+                          <GroupExpression>=Fields!Day.Value</GroupExpression>
+                        </GroupExpressions>
+                      </Group>
+                      <SortExpressions>
+                        <SortExpression>
+                          <Value>=Fields!Day.Value</Value>
+                        </SortExpression>
+                      </SortExpressions>
                       <TablixHeader>
                         <Size>0.21in</Size>
                         <CellContents>
-                          <Textbox Name="Date">
+                          <Textbox Name="Day">
                             <CanGrow>true</CanGrow>
                             <KeepTogether>true</KeepTogether>
                             <Paragraphs>
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=Fields!Date.Value</Value>
-                                    <Style>
-                                      <Format>dd</Format>
-                                    </Style>
+                                    <Value>=Fields!Day.Value</Value>
+                                    <Style />
                                   </TextRun>
                                 </TextRuns>
                                 <Style>
@@ -227,12 +324,31 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                                 </Style>
                               </Paragraph>
                             </Paragraphs>
-                            <rd:DefaultName>Date</rd:DefaultName>
+                            <rd:DefaultName>Day</rd:DefaultName>
                             <Style>
                               <Border>
-                                <Color>LightGrey</Color>
                                 <Style>Solid</Style>
                               </Border>
+                              <TopBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </TopBorder>
+                              <BottomBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </BottomBorder>
+                              <LeftBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </LeftBorder>
+                              <RightBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </RightBorder>
                               <PaddingLeft>2pt</PaddingLeft>
                               <PaddingRight>2pt</PaddingRight>
                               <PaddingTop>2pt</PaddingTop>
@@ -241,55 +357,8 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                           </Textbox>
                         </CellContents>
                       </TablixHeader>
-                      <TablixMembers>
-                        <TablixMember>
-                          <Group Name="matrix1_Day">
-                            <GroupExpressions>
-                              <GroupExpression>=Fields!Day.Value</GroupExpression>
-                            </GroupExpressions>
-                          </Group>
-                          <SortExpressions>
-                            <SortExpression>
-                              <Value>=Fields!Day.Value</Value>
-                            </SortExpression>
-                          </SortExpressions>
-                          <TablixHeader>
-                            <Size>0.21in</Size>
-                            <CellContents>
-                              <Textbox Name="Day">
-                                <CanGrow>true</CanGrow>
-                                <KeepTogether>true</KeepTogether>
-                                <Paragraphs>
-                                  <Paragraph>
-                                    <TextRuns>
-                                      <TextRun>
-                                        <Value>=Fields!Day.Value</Value>
-                                        <Style />
-                                      </TextRun>
-                                    </TextRuns>
-                                    <Style>
-                                      <TextAlign>Center</TextAlign>
-                                    </Style>
-                                  </Paragraph>
-                                </Paragraphs>
-                                <rd:DefaultName>Day</rd:DefaultName>
-                                <Style>
-                                  <Border>
-                                    <Color>LightGrey</Color>
-                                    <Style>Solid</Style>
-                                  </Border>
-                                  <PaddingLeft>2pt</PaddingLeft>
-                                  <PaddingRight>2pt</PaddingRight>
-                                  <PaddingTop>2pt</PaddingTop>
-                                  <PaddingBottom>2pt</PaddingBottom>
-                                </Style>
-                              </Textbox>
-                            </CellContents>
-                          </TablixHeader>
-                          <DataElementOutput>Output</DataElementOutput>
-                          <KeepTogether>true</KeepTogether>
-                        </TablixMember>
-                      </TablixMembers>
+                      <DataElementOutput>Output</DataElementOutput>
+                      <KeepTogether>true</KeepTogether>
                     </TablixMember>
                   </TablixMembers>
                   <DataElementOutput>Output</DataElementOutput>
@@ -299,27 +368,27 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
             <TablixRowHierarchy>
               <TablixMembers>
                 <TablixMember>
-                  <Group Name="matrix1_Trainer">
+                  <Group Name="matrix1_Location">
                     <GroupExpressions>
-                      <GroupExpression>=Fields!Trainer.Value</GroupExpression>
+                      <GroupExpression>=Fields!Location.Value</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=Fields!Trainer.Value</Value>
+                      <Value>=Fields!Location.Value</Value>
                     </SortExpression>
                   </SortExpressions>
                   <TablixHeader>
-                    <Size>1.14167in</Size>
+                    <Size>1.33333in</Size>
                     <CellContents>
-                      <Textbox Name="Trainer">
+                      <Textbox Name="Location">
                         <CanGrow>true</CanGrow>
                         <KeepTogether>true</KeepTogether>
                         <Paragraphs>
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>=Fields!Trainer.Value</Value>
+                                <Value>=Fields!Location.Value</Value>
                                 <Style />
                               </TextRun>
                             </TextRuns>
@@ -328,12 +397,31 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                             </Style>
                           </Paragraph>
                         </Paragraphs>
-                        <rd:DefaultName>Trainer</rd:DefaultName>
+                        <rd:DefaultName>Location</rd:DefaultName>
                         <Style>
                           <Border>
-                            <Color>LightGrey</Color>
                             <Style>Solid</Style>
                           </Border>
+                          <TopBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </TopBorder>
+                          <BottomBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </BottomBorder>
+                          <LeftBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </LeftBorder>
+                          <RightBorder>
+                            <Color>Black</Color>
+                            <Style>Solid</Style>
+                            <Width>1pt</Width>
+                          </RightBorder>
                           <VerticalAlign>Middle</VerticalAlign>
                           <PaddingLeft>2pt</PaddingLeft>
                           <PaddingRight>2pt</PaddingRight>
@@ -356,7 +444,7 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                         </SortExpression>
                       </SortExpressions>
                       <TablixHeader>
-                        <Size>0.475in</Size>
+                        <Size>0.50833in</Size>
                         <CellContents>
                           <Textbox Name="Time">
                             <CanGrow>true</CanGrow>
@@ -377,9 +465,28 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
                             <rd:DefaultName>Time</rd:DefaultName>
                             <Style>
                               <Border>
-                                <Color>LightGrey</Color>
                                 <Style>Solid</Style>
                               </Border>
+                              <TopBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </TopBorder>
+                              <BottomBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </BottomBorder>
+                              <LeftBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </LeftBorder>
+                              <RightBorder>
+                                <Color>Black</Color>
+                                <Style>Solid</Style>
+                                <Width>1pt</Width>
+                              </RightBorder>
                               <VerticalAlign>Middle</VerticalAlign>
                               <PaddingLeft>2pt</PaddingLeft>
                               <PaddingRight>2pt</PaddingRight>
@@ -402,15 +509,15 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
             <DataSetName>DataSet1</DataSetName>
             <Top>0.42in</Top>
             <Height>0.63in</Height>
-            <Width>2.61667in</Width>
+            <Width>2.84167in</Width>
             <ZIndex>1</ZIndex>
             <Style />
           </Tablix>
         </ReportItems>
-        <Height>1.3in</Height>
+        <Height>1.05in</Height>
         <Style />
       </Body>
-      <Width>5in</Width>
+      <Width>8.21667in</Width>
       <Page>
         <PageHeight>11.69in</PageHeight>
         <PageWidth>16.54in</PageWidth>
@@ -423,53 +530,55 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="StartDate">
+    <ReportParameter Name="startDate">
       <DataType>DateTime</DataType>
       <DefaultValue>
-        <Values>
-          <Value>08/01/2016 00:00:00</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>DataSet2</DataSetName>
+          <ValueField>StartOfMonth</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>Start Date</Prompt>
     </ReportParameter>
-    <ReportParameter Name="EndDate">
+    <ReportParameter Name="endDate">
       <DataType>DateTime</DataType>
       <DefaultValue>
-        <Values>
-          <Value>08/31/2016 00:00:00</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>DataSet2</DataSetName>
+          <ValueField>EndOfMonth</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>End Date</Prompt>
     </ReportParameter>
-    <ReportParameter Name="IncludeWeekends">
+    <ReportParameter Name="includeWeekends">
       <DataType>Boolean</DataType>
       <DefaultValue>
         <Values>
           <Value>false</Value>
         </Values>
       </DefaultValue>
-      <Prompt>Include Weekends?</Prompt>
+      <Prompt>include Weekends</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
-      <NumberOfColumns>4</NumberOfColumns>
+      <NumberOfColumns>2</NumberOfColumns>
       <NumberOfRows>2</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>StartDate</ParameterName>
+          <ParameterName>startDate</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>1</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>EndDate</ParameterName>
+          <ParameterName>endDate</ParameterName>
         </CellDefinition>
         <CellDefinition>
-          <ColumnIndex>2</ColumnIndex>
-          <RowIndex>0</RowIndex>
-          <ParameterName>IncludeWeekends</ParameterName>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>1</RowIndex>
+          <ParameterName>includeWeekends</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -477,5 +586,5 @@ FROM     train.plan_trainer(@StartDate, @EndDate, @IncludeWeekends) AS plan_trai
   <Language>en-US</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
-  <rd:ReportID>60059514-2627-449f-a9d8-6f395af118fd</rd:ReportID>
+  <rd:ReportID>87142191-c55f-46ef-8baa-eb7a43dde2c8</rd:ReportID>
 </Report>

@@ -14,8 +14,12 @@
       <FullPath>TrainPlan1.rdl</FullPath>
     </ProjectItem>
     <ProjectItem>
-      <Name>TrainPlan2.rdl</Name>
-      <FullPath>TrainPlan2.rdl</FullPath>
+      <Name>Training Planner - Trainer.rdl</Name>
+      <FullPath>Training Planner - Trainer.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>Training Planner - Location.rdl</Name>
+      <FullPath>Training Planner - Location.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>
